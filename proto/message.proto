@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package messages;
+
+service MessageService {
+  rpc GetMessage (MessageRequest) returns (MessageResponse) {}
+  rpc SendMessage (SendMessageRequest) returns (MessageResponse) {}
+}
+
+message MessageRequest {
+  string id = 1;
+}
+
+message SendMessageRequest {
+    string content = 1;
+  }
+
+message MessageResponse {
+  string content = 1;
+  int64 timestamp = 2;
+}

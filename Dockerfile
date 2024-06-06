@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=builder /app/target/release/grpc-server /usr/local/bin/grpc-server
 ## descriptor file
-COPY --from=builder /app/proto/hello_descriptor.bin /usr/local/bin/proto/hello_descriptor.bin
+COPY --from=builder /app/proto/descriptor.bin /usr/local/bin/proto/descriptor.bin
 
 EXPOSE 50051
 
