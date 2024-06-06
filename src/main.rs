@@ -35,12 +35,13 @@ impl Greeter for MyGreeter {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
-    let addr = "[::1]:50051".parse()?;
+    let addr = "0.0.0.0:50051".parse()?;
     let greeter = MyGreeter::default();
 
     info!("Starting gRPC server on {}", addr);
-
-    let encoded_file_descriptor_set = read("proto/hello_descriptor.bin").unwrap();
+    // Load the encoded file descriptor set from the file system.
+    // let encoded_file_descriptor_set = read("proto/hello_descriptor.bin").unwrap();
+    let encoded_file_descriptor_set = read("/usr/local/bin/proto/hello_descriptor.bin").unwrap();
     let reflection_service = Builder::configure()
         .register_encoded_file_descriptor_set(&encoded_file_descriptor_set)
         .build()
