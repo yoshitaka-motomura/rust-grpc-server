@@ -18,7 +18,7 @@ tonic-reflection = "0.11"
 tonic-build = "0.11"
 
 [[bin]]
-name = "server"
+name = "grpc-server"
 path = "src/main.rs"
 
 [[bin]]

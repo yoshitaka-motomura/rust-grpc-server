@@ -1,6 +1,6 @@
 FROM rust:1.78.0-bullseye as builder
 
-RUN apt-get update && apt-get install -y protobuf-compiler
+RUN apt-get update && apt-get install -y --no-install-recommends protobuf-compiler
 
 WORKDIR /app
 
@@ -18,8 +18,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/target/release/grpc-server /usr/local/bin/grpc-server
-## descriptor file
-COPY --from=builder /app/proto/descriptor.bin /usr/local/bin/proto/descriptor.bin
+
 
 EXPOSE 50051
 
