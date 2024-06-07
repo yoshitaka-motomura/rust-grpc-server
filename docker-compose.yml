@@ -1,7 +1,8 @@
 services:
   grpc:
-    image: rust-grpc-server:latest
+    image: rust-builder:latest
     ports:
       - "50051:50051"
+      - "8080:80"
     environment:
       - RUST_LOG=debug

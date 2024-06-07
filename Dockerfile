@@ -1,6 +1,24 @@
-FROM rust:1.78.0-bullseye as builder
+FROM rust:1.78.0-alpine3.20 as builder
 
-RUN apt-get update && apt-get install -y --no-install-recommends protobuf-compiler
+RUN apk add --no-cache curl=8.7.1-r0 unzip=6.0-r14 build-base=0.5-r3
+
+ARG TARGETPLATFORM
+
+RUN case "$TARGETPLATFORM" in \
+    "linux/amd64") \
+        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v27.1/protoc-27.1-linux-x86_64.zip && \
+        unzip protoc-27.1-linux-x86_64.zip -d /usr/local && \
+        rm protoc-27.1-linux-x86_64.zip \
+        ;; \
+    "linux/arm64") \
+        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v27.1/protoc-27.1-linux-aarch_64.zip && \
+        unzip protoc-27.1-linux-aarch_64.zip -d /usr/local && \
+        rm protoc-27.1-linux-aarch_64.zip \
+        ;; \
+    *) echo "Unsupported platform: $TARGETPLATFORM" && exit 1 ;; \
+    esac
+
+ENV PATH=$PATH:/usr/local/bin
 
 WORKDIR /app
 
@@ -10,16 +28,14 @@ COPY . .
 
 RUN cargo build --release
 
-FROM debian:bullseye
+FROM nginx:1.21.3-alpine as runtime
 
-RUN apt-get update && apt-get install -y \
-    libssl-dev \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache supervisor
+
+COPY ./configure/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY --from=builder /app/target/release/grpc-server /usr/local/bin/grpc-server
 
+EXPOSE 80 50051
 
-EXPOSE 50051
-
-CMD ["grpc-server"]
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
