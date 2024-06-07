@@ -1,10 +1,7 @@
 use chrono::Utc;
 use env_logger;
 use log::{debug, info};
-use std::env;
-use std::fs::read;
 use tonic::{transport::Server, Request, Response, Status};
-use tonic_reflection::server::Builder;
 
 pub mod hello {
     tonic::include_proto!("hello");
@@ -89,25 +86,15 @@ impl MessageService for MyMessageService {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
 
-    //TODO: Temporary code for reading the descriptor file.
-    let descripptor_file_path = env::var("DESCRIPTOR_FILE_PATH")
-        .unwrap_or_else(|_| "/usr/local/bin/proto/descriptor.bin".to_string());
     let addr = "0.0.0.0:50051".parse()?;
     let greeter = MyGreeter::default();
     let message_service = MyMessageService::default();
 
     info!("Starting gRPC server on {}", addr);
 
-    let encoded_file_descriptor_set = read(descripptor_file_path).unwrap();
-    let reflection_service = Builder::configure()
-        .register_encoded_file_descriptor_set(&encoded_file_descriptor_set)
-        .build()
-        .unwrap();
-
     Server::builder()
         .add_service(GreeterServer::new(greeter))
         .add_service(MessageServiceServer::new(message_service))
-        .add_service(reflection_service)
         .serve(addr)
         .await?;
 
