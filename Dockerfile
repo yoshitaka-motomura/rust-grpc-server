@@ -30,7 +30,7 @@ RUN cargo build --release
 
 FROM nginx:1.21.3-alpine as runtime
 
-RUN apk add --no-cache supervisor=4.2.2-r0
+RUN apk add --no-cache supervisor
 
 COPY ./configure/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
