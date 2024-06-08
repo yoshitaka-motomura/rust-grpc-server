@@ -10,7 +10,7 @@ pub mod messages {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = GreeterClient::connect("http://0.0.0.0:50051").await?;
+    let mut client = GreeterClient::connect("http://0.0.0.0:8080").await?;
 
     let request = tonic::Request::new(HelloRequest {
         name: "Tonic".into(),
@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("RESPONSE={:?}", response);
 
-    let mut message_client = MessageServiceClient::connect("http://0.0.0.0:50051").await?;
+    let mut message_client = MessageServiceClient::connect("http://0.0.0.0:8080").await?;
 
     let send_request = tonic::Request::new(SendMessageRequest {
         content: "Hello, world!".to_string(),

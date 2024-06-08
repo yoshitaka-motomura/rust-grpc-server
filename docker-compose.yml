@@ -1,8 +1,9 @@
 services:
   grpc:
-    image: rust-builder:latest
+    image: 720749898583.dkr.ecr.ap-northeast-1.amazonaws.com/rust-grpc:a45c3d8a72f9a65082fa363a321537066d485af9
     ports:
-      - "50051:50051"
       - "8080:80"
     environment:
       - RUST_LOG=debug
+    volumes:
+      - ./configure/default.conf:/etc/nginx/conf.d/default.conf

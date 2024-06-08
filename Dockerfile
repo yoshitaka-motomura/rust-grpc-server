@@ -30,9 +30,11 @@ RUN cargo build --release
 
 FROM nginx:1.21.3-alpine as runtime
 
-RUN apk add --no-cache supervisor
+RUN apk add --no-cache supervisor=4.2.2-r0
 
 COPY ./configure/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+COPY ./configure/default.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=builder /app/target/release/grpc-server /usr/local/bin/grpc-server
 
