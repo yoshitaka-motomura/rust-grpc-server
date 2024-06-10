@@ -1,9 +1,13 @@
 services:
   grpc:
-    image: 720749898583.dkr.ecr.ap-northeast-1.amazonaws.com/rust-grpc:a45c3d8a72f9a65082fa363a321537066d485af9
+    image: grpc-server-test:latest
     ports:
       - "8080:80"
     environment:
       - RUST_LOG=debug
-    volumes:
-      - ./configure/default.conf:/etc/nginx/conf.d/default.conf
+    healthcheck:
+      test: ["CMD", "grpc-health-probe", "-addr=localhost:80", "-connect-timeout=1s", "-rpc-timeout=1s"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

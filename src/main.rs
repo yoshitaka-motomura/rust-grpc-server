@@ -2,6 +2,7 @@ use chrono::Utc;
 use env_logger;
 use log::{debug, info};
 use tonic::{transport::Server, Request, Response, Status};
+use tonic_health::server::health_reporter;
 
 pub mod hello {
     tonic::include_proto!("hello");
@@ -89,10 +90,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "0.0.0.0:50051".parse()?;
     let greeter = MyGreeter::default();
     let message_service = MyMessageService::default();
+    let (mut health_reporter, health_service) = health_reporter();
+    health_reporter.set_serving::<GreeterServer<MyGreeter>>().await;
+    health_reporter.set_serving::<MessageServiceServer<MyMessageService>>().await;
 
     info!("Starting gRPC server on {}", addr);
 
     Server::builder()
+        .add_service(health_service)
         .add_service(GreeterServer::new(greeter))
         .add_service(MessageServiceServer::new(message_service))
         .serve(addr)
