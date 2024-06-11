@@ -10,7 +10,9 @@ pub mod messages {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = GreeterClient::connect("http://0.0.0.0:8080").await?;
+    //let url = "https://grpc.cristallum.io";
+    let url = "http://localhost:8080";
+    let mut client = GreeterClient::connect(url).await?;
 
     let request = tonic::Request::new(HelloRequest {
         name: "Tonic".into(),
@@ -20,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("RESPONSE={:?}", response);
 
-    let mut message_client = MessageServiceClient::connect("http://0.0.0.0:8080").await?;
+    let mut message_client = MessageServiceClient::connect(url).await?;
 
     let send_request = tonic::Request::new(SendMessageRequest {
         content: "Hello, world!".to_string(),
