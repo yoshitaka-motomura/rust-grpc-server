@@ -2,10 +2,10 @@ name: Rust gRPC Server Build
 on:
   workflow_dispatch:
     inputs:
-      ref_name:
-        description: 'Branch or Tag name'
+      tag:
+        description: 'Tag'
         required: true
-        default: 'main'
+        default: 'latest'
 permissions:
   contents: read
   id-token: write
@@ -13,7 +13,7 @@ env:
   AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
   ECR_REGISTRY: 720749898583.dkr.ecr.ap-northeast-1.amazonaws.com
   ECR_REPOSITORY: rust-grpc
-  IMAGE_TAG: ${{ github.ref_name }}
+  IMAGE_TAG: ${{ github.event.inputs.tag }}
 jobs:
   build:
     runs-on: ubuntu-latest
