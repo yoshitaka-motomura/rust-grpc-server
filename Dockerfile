@@ -48,6 +48,7 @@ RUN case "$TARGETPLATFORM" in \
 COPY ./configure/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY ./configure/default.conf /etc/nginx/conf.d/default.conf
+COPY ./configure/nginx.conf /etc/nginx/nginx.conf
 
 COPY --from=builder /app/target/release/grpc-server /usr/local/bin/grpc-server
 

@@ -8,11 +8,16 @@ import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as dotenv from 'dotenv';
 
+dotenv.config();
 export class GrpcEcsServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-    const acmARN = 'arn:aws:acm:ap-northeast-1:720749898583:certificate/654e1e91-90f2-4e48-93e3-c4b4e400b177';
+    const acmARN = process.env.ACM_ARN || null
+    if (acmARN === null) {
+      throw new Error('ACM_ARN is required')
+    }
 
     const ecrRepository = ecr.Repository.fromRepositoryName(this, 'ECRRepository', 'rust-grpc');
 
@@ -51,16 +56,9 @@ export class GrpcEcsServiceStack extends cdk.Stack {
         timeout: cdk.Duration.seconds(5),
       },
       portMappings: [
-        // {
-        //   containerPort: 80,
-        //   protocol: ecs.Protocol.TCP,
-        //   hostPort: 80
-        // },
         {
-          containerPort: 50051,
+          containerPort: 80,
           protocol: ecs.Protocol.TCP,
-          appProtocol: cdk.aws_ecs.AppProtocol.grpc,
-          name: '80'
         },
       ]
     });
@@ -72,6 +70,7 @@ export class GrpcEcsServiceStack extends cdk.Stack {
       taskDefinition,
       desiredCount: 1,
       assignPublicIp: true,
+      enableExecuteCommand: true
     });
 
     const lb = new elbv2.ApplicationLoadBalancer(this, 'LB', {
@@ -94,7 +93,6 @@ export class GrpcEcsServiceStack extends cdk.Stack {
       targets: [service],
       targetType: elbv2.TargetType.IP,
       healthCheck: {
-        port: '50051',
         enabled: true,
         interval: cdk.Duration.seconds(30),
         timeout: cdk.Duration.seconds(5),
