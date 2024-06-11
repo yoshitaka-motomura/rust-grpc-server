@@ -51,6 +51,6 @@ COPY ./configure/default.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=builder /app/target/release/grpc-server /usr/local/bin/grpc-server
 
-EXPOSE 80 50051
+EXPOSE 80 8080 50051
 
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

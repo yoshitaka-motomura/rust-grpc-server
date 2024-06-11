@@ -5,6 +5,8 @@ services:
       - "8080:80"
     environment:
       - RUST_LOG=debug
+    volumes:
+      - ./configure/default.conf:/etc/nginx/conf.d/default.conf
     healthcheck:
       test: ["CMD", "grpc-health-probe", "-addr=localhost:80", "-connect-timeout=1s", "-rpc-timeout=1s"]
       interval: 30s
