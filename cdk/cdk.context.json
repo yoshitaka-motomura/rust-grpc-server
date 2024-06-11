@@ -1,0 +1,11 @@
+{
+  "availability-zones:account=720749898583:region=ap-northeast-1": [
+    "ap-northeast-1a",
+    "ap-northeast-1c",
+    "ap-northeast-1d"
+  ],
+  "hosted-zone:account=720749898583:domainName=cristallum.io:region=ap-northeast-1": {
+    "Id": "/hostedzone/Z03418681DS8B48P5NO6C",
+    "Name": "cristallum.io."
+  }
+}
