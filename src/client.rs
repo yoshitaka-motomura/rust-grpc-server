@@ -10,8 +10,8 @@ pub mod messages {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    //let url = "https://grpc.cristallum.io";
-    let url = "http://localhost:8080";
+    let url = "https://grpc.cristallum.io";
+    //let url = "http://localhost:8080";
     let mut client = GreeterClient::connect(url).await?;
 
     let request = tonic::Request::new(HelloRequest {

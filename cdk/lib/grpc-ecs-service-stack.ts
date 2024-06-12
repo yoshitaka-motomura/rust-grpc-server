@@ -28,6 +28,7 @@ export class GrpcEcsServiceStack extends cdk.Stack {
 
     const cluster = new ecs.Cluster(this, 'ServiceCluster', {
       vpc: vpc,
+      clusterName: 'grpc-service-cluster',
     });
 
     const logGroup = new logs.LogGroup(this, 'LogGroup', {
@@ -43,13 +44,14 @@ export class GrpcEcsServiceStack extends cdk.Stack {
     });
 
     const container = taskDefinition.addContainer('GrpcServiceContainer', {
-      image: ecs.ContainerImage.fromEcrRepository(ecrRepository, 'v0.2.0'),
+      containerName: 'grpc-service-container',
+      image: ecs.ContainerImage.fromEcrRepository(ecrRepository, 'v0.2.1'),
       logging: new ecs.AwsLogDriver({
         logGroup: logGroup,
         streamPrefix: 'grpc-service-container',
       }),
       healthCheck: {
-        command: ["CMD-SHELL", "grpc-health-probe -addr localhost:80 -connect-timeout 1s -rpc-timeout 1s || exit 1"],
+        command: ["CMD-SHELL", "grpc-health-probe -addr localhost:50051 -connect-timeout 1s -rpc-timeout 1s || exit 1"],
         interval: cdk.Duration.seconds(30),
         retries: 3,
         startPeriod: cdk.Duration.seconds(5),
@@ -57,7 +59,7 @@ export class GrpcEcsServiceStack extends cdk.Stack {
       },
       portMappings: [
         {
-          containerPort: 80,
+          containerPort: 50051,
           protocol: ecs.Protocol.TCP,
         },
       ]
@@ -70,13 +72,15 @@ export class GrpcEcsServiceStack extends cdk.Stack {
       taskDefinition,
       desiredCount: 1,
       assignPublicIp: true,
-      enableExecuteCommand: true
+      enableExecuteCommand: true,
+      serviceName: 'grpc-service',
     });
 
     const lb = new elbv2.ApplicationLoadBalancer(this, 'LB', {
       vpc,
       internetFacing: true,
-      http2Enabled: true
+      loadBalancerName: 'grpc-service-lb',
+      //http2Enabled: true
     });
 
     const listener = lb.addListener('Listener', {
@@ -103,6 +107,7 @@ export class GrpcEcsServiceStack extends cdk.Stack {
         path: '/grpc.health.v1.Health/Check',
         healthyGrpcCodes: '0-99',
       },
+      targetGroupName: 'grpc-target-group',
     });
 
     listener.addTargetGroups('GrpcTargetGroupAttachment', {
